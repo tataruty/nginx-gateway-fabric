@@ -11,6 +11,7 @@ import (
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/nginx/config/policies"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/nginx/config/policies/upstreamsettings"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/nginx/config/stream"
+	"github.com/nginx/nginx-gateway-fabric/internal/controller/nginx/types"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/state/dataplane"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/state/resolver"
 	"github.com/nginx/nginx-gateway-fabric/internal/framework/helpers"
@@ -216,7 +217,7 @@ func TestCreateUpstreams(t *testing.T) {
 			ZoneSize: ossZoneSize,
 			Servers: []http.UpstreamServer{
 				{
-					Address: nginx503Server,
+					Address: types.Nginx503Server,
 				},
 			},
 		},
@@ -277,7 +278,7 @@ func TestCreateUpstream(t *testing.T) {
 				ZoneSize: ossZoneSize,
 				Servers: []http.UpstreamServer{
 					{
-						Address: nginx503Server,
+						Address: types.Nginx503Server,
 					},
 				},
 			},
@@ -293,7 +294,7 @@ func TestCreateUpstream(t *testing.T) {
 				ZoneSize: ossZoneSize,
 				Servers: []http.UpstreamServer{
 					{
-						Address: nginx503Server,
+						Address: types.Nginx503Server,
 					},
 				},
 			},
@@ -581,7 +582,7 @@ func TestCreateUpstreamPlus(t *testing.T) {
 				StateFile: stateDir + "/no-endpoints.conf",
 				Servers: []http.UpstreamServer{
 					{
-						Address: nginx503Server,
+						Address: types.Nginx503Server,
 					},
 				},
 			},

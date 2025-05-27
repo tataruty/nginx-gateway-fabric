@@ -15,6 +15,7 @@ import (
 
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/nginx/agent/broadcast"
 	agentgrpc "github.com/nginx/nginx-gateway-fabric/internal/controller/nginx/agent/grpc"
+	"github.com/nginx/nginx-gateway-fabric/internal/controller/nginx/types"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/state/dataplane"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/state/resolver"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/status"
@@ -179,6 +180,16 @@ func buildStreamUpstreamServers(upstream dataplane.Upstream) *pb.UpdateStreamSer
 }
 
 func buildUpstreamServers(upstream dataplane.Upstream) []*structpb.Struct {
+	if len(upstream.Endpoints) == 0 {
+		return []*structpb.Struct{
+			{
+				Fields: map[string]*structpb.Value{
+					"server": structpb.NewStringValue(types.Nginx503Server),
+				},
+			},
+		}
+	}
+
 	servers := make([]*structpb.Struct, 0, len(upstream.Endpoints))
 
 	for _, endpoint := range upstream.Endpoints {

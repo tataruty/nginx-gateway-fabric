@@ -12,6 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/nginx/agent/broadcast/broadcastfakes"
+	"github.com/nginx/nginx-gateway-fabric/internal/controller/nginx/types"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/state/dataplane"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/state/resolver"
 	"github.com/nginx/nginx-gateway-fabric/internal/controller/status"
@@ -179,6 +180,10 @@ func TestUpdateUpstreamServers(t *testing.T) {
 								},
 							},
 						},
+						{
+							Name:      "empty-upstream",
+							Endpoints: []resolver.Endpoint{},
+						},
 					},
 					StreamUpstreams: []dataplane.Upstream{
 						{
@@ -213,6 +218,20 @@ func TestUpdateUpstreamServers(t *testing.T) {
 						},
 					},
 					{
+						Action: &pb.NGINXPlusAction_UpdateHttpUpstreamServers{
+							UpdateHttpUpstreamServers: &pb.UpdateHTTPUpstreamServers{
+								HttpUpstreamName: "empty-upstream",
+								Servers: []*structpb.Struct{
+									{
+										Fields: map[string]*structpb.Value{
+											"server": structpb.NewStringValue(types.Nginx503Server),
+										},
+									},
+								},
+							},
+						},
+					},
+					{
 						Action: &pb.NGINXPlusAction_UpdateStreamServers{
 							UpdateStreamServers: &pb.UpdateStreamServers{
 								UpstreamStreamName: "test-stream-upstream",
@@ -234,11 +253,12 @@ func TestUpdateUpstreamServers(t *testing.T) {
 				g.Expect(fakeBroadcaster.SendCallCount()).To(Equal(0))
 			} else if test.buildUpstreams {
 				g.Expect(deployment.GetNGINXPlusActions()).To(Equal(expActions))
-				g.Expect(fakeBroadcaster.SendCallCount()).To(Equal(2))
+				g.Expect(fakeBroadcaster.SendCallCount()).To(Equal(3))
 			}
 
 			if test.expErr {
 				expErr := errors.Join(
+					fmt.Errorf("couldn't update upstream via the API: %w", testErr),
 					fmt.Errorf("couldn't update upstream via the API: %w", testErr),
 					fmt.Errorf("couldn't update upstream via the API: %w", testErr),
 				)
